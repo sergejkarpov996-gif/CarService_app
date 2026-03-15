@@ -64,19 +64,36 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
 .svc-item-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent}
 .svc-item.selected .svc-item-check{background:var(--red);border-color:var(--red);color:#fff}
 
-.date-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;scrollbar-width:none}
-.date-strip::-webkit-scrollbar{display:none}
-.date-chip{flex-shrink:0;background:var(--card);border:2px solid var(--border);border-radius:12px;padding:10px 14px;text-align:center;cursor:pointer;transition:all 0.2s;min-width:58px}
-.date-chip.selected{border-color:var(--red);background:var(--red-light)}
-.date-chip-day{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
-.date-chip-num{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;color:var(--text);line-height:1.2;margin:2px 0}
-.date-chip-month{font-size:10px;color:var(--muted)}
-.date-chip.selected .date-chip-day,.date-chip.selected .date-chip-num,.date-chip.selected .date-chip-month{color:var(--red)}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-month{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;color:var(--text)}
+.cal-nav{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:var(--card);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;color:var(--text)}
+.cal-nav:hover{border-color:var(--red);color:var(--red)}
+.cal-nav:disabled{opacity:0.3;cursor:not-allowed}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
+.cal-wd{text-align:center;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.3px;padding:4px 0}
+.cal-wd.weekend{color:#E63946}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:20px}
+.cal-day{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;position:relative;border:2px solid transparent}
+.cal-day.empty{cursor:default}
+.cal-day.past{color:#ccc;cursor:not-allowed}
+.cal-day.weekend{color:#E63946;opacity:0.35;cursor:not-allowed}
+.cal-day.available{background:var(--card);color:var(--text);border-color:var(--border)}
+.cal-day.available:hover{border-color:var(--red);background:var(--red-light)}
+.cal-day.selected{background:var(--red);color:#fff;border-color:var(--red)}
+.cal-day.today-mark::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--red)}
+.cal-day.selected.today-mark::after{background:#fff}
 
-.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
-.time-btn{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:13px 6px;text-align:center;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;transition:all 0.2s;font-family:'Nunito',sans-serif}
+.time-section{background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px;border:1px solid var(--border)}
+.time-section-header{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.time-btn{background:var(--bg);border:2px solid var(--border);border-radius:12px;padding:13px 6px;text-align:center;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;transition:all 0.2s;font-family:'Nunito',sans-serif;position:relative}
 .time-btn.selected{border-color:var(--red);background:var(--red-light);color:var(--red)}
-.time-btn.busy{background:#f8f8f8;color:#ccc;cursor:not-allowed;border-color:#eee;text-decoration:line-through;font-size:11px}
+.time-btn.busy{background:#f8f8f8;color:#bbb;cursor:not-allowed;border-color:#eee;font-size:13px}
+.time-btn.busy::after{content:'занято';position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:8px;color:#bbb;font-family:'Nunito',sans-serif;letter-spacing:0.2px}
+.time-btn.past{opacity:0.35;cursor:not-allowed}
+.legend{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
 
 .field{margin-bottom:14px}
 .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px}
@@ -168,10 +185,30 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
     <div class="screen" id="s3">
       <div class="screen-content">
         <div class="screen-title">Дата и время</div>
-        <div class="screen-sub">Выберите удобный день и слот</div>
-        <div class="date-strip" id="dateStrip"></div>
-        <div class="time-section-label">Доступное время</div>
-        <div class="time-grid" id="timeGrid"></div>
+        <div class="screen-sub">Выберите день и свободный слот</div>
+        <div class="cal-header">
+          <button class="cal-nav" id="calPrev" onclick="changeMonth(-1)">‹</button>
+          <div class="cal-month" id="calMonth"></div>
+          <button class="cal-nav" id="calNext" onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="cal-weekdays">
+          <div class="cal-wd">Пн</div><div class="cal-wd">Вт</div>
+          <div class="cal-wd">Ср</div><div class="cal-wd">Чт</div>
+          <div class="cal-wd">Пт</div>
+          <div class="cal-wd weekend">Сб</div><div class="cal-wd weekend">Вс</div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--card);border:2px solid var(--border)"></div>Свободно</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Выбрано</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f8f8f8;border:2px solid #eee"></div>Выходной / прошедший</div>
+        </div>
+        <div id="timeWrap" style="display:none">
+          <div class="time-section">
+            <div class="time-section-header">🕐 Выберите время</div>
+            <div class="time-grid" id="timeGrid"></div>
+          </div>
+        </div>
       </div>
       <div class="bottom-btn-wrap">
         <button class="bottom-btn" id="btn3" disabled onclick="goTo(4)">Далее →</button>
@@ -234,14 +271,25 @@ const SERVICES = {
 };
 
 const ALL_TIMES = ['09:00','10:00','11:00','12:00','14:00','15:00','16:00','17:00'];
-const WEEKDAYS = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
-const MONTHS = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const WEEKDAYS_SHORT = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 
 // ⚠️ ЗАПОЛНИ: URL твоего бота для получения заявок
 const BOT_WEBHOOK = 'https://109.120.184.236/booking';
 
-let state = { dept:null, deptName:'', service:null, dateLabel:'', time:null, dateOffset:0 };
+// Занятые слоты: { "dept:дд.мм": ["10:00","14:00"] }
+// В реальном проекте грузить с сервера, сейчас — демо-данные
+const BOOKED_SLOTS = {
+  'body:17.03': ['10:00','14:00'],
+  'mech:17.03': ['09:00','15:00'],
+  'body:18.03': ['09:00','11:00','16:00'],
+  'mech:19.03': ['12:00','17:00'],
+};
+
+let state = { dept:null, deptName:'', service:null, dateLabel:'', dateKey:'', time:null };
 let currentScreen = 1;
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
 
 function selectDept(d) {
   state.dept = d;
@@ -272,31 +320,81 @@ function buildServices() {
 }
 
 function buildDates() {
-  const strip = document.getElementById('dateStrip');
-  strip.innerHTML = '';
+  buildCalendar();
+  document.getElementById('timeWrap').style.display = 'none';
+  state.time = null;
+  state.dateLabel = '';
+  state.dateKey = '';
+  document.getElementById('btn3').disabled = true;
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  buildCalendar();
+}
+
+function buildCalendar() {
   const today = new Date();
-  let count = 0;
-  for (let i = 0; count < 7; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    if (d.getDay() === 0 || d.getDay() === 6) continue;
-    if (i === 0 && new Date().getHours() >= 17) continue;
-    const label = WEEKDAYS[d.getDay()] + ' ' + d.getDate() + '.' + String(d.getMonth()+1).padStart(2,'0');
-    const chip = document.createElement('div');
-    chip.className = 'date-chip';
-    chip.dataset.offset = i;
-    chip.innerHTML = `<div class="date-chip-day">${WEEKDAYS[d.getDay()]}</div><div class="date-chip-num">${d.getDate()}</div><div class="date-chip-month">${MONTHS[d.getMonth()]}</div>`;
-    chip.onclick = () => {
-      document.querySelectorAll('.date-chip').forEach(x => x.classList.remove('selected'));
-      chip.classList.add('selected');
-      state.dateLabel = label;
-      state.dateOffset = parseInt(chip.dataset.offset);
-      buildTimes(state.dateOffset === 0);
-    };
-    strip.appendChild(chip);
-    count++;
+  today.setHours(0,0,0,0);
+  const now = new Date();
+
+  document.getElementById('calMonth').textContent = MONTHS_RU[calMonth] + ' ' + calYear;
+
+  // Disable prev if current month
+  document.getElementById('calPrev').disabled =
+    (calYear === today.getFullYear() && calMonth === today.getMonth());
+
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  const firstDay = new Date(calYear, calMonth, 1);
+  // Mon=0 ... Sun=6
+  let startDow = firstDay.getDay() - 1;
+  if (startDow < 0) startDow = 6;
+
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+  // Empty cells
+  for (let i = 0; i < startDow; i++) {
+    const empty = document.createElement('div');
+    empty.className = 'cal-day empty';
+    grid.appendChild(empty);
   }
-  buildTimes(false);
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(calYear, calMonth, d);
+    date.setHours(0,0,0,0);
+    const dow = date.getDay(); // 0=Sun, 6=Sat
+    const isWeekend = (dow === 0 || dow === 6);
+    const isPast = date < today || (date.getTime() === today.getTime() && now.getHours() >= 17);
+    const isToday = date.getTime() === today.getTime();
+    const dayKey = String(d).padStart(2,'0') + '.' + String(calMonth+1).padStart(2,'0');
+    const dayLabel = WEEKDAYS_SHORT[dow] + ' ' + dayKey;
+
+    const el = document.createElement('div');
+    let cls = 'cal-day';
+    if (isWeekend) cls += ' weekend';
+    else if (isPast) cls += ' past';
+    else cls += ' available';
+    if (isToday) cls += ' today-mark';
+    el.className = cls;
+    el.textContent = d;
+
+    if (!isWeekend && !isPast) {
+      el.onclick = () => {
+        document.querySelectorAll('.cal-day').forEach(x => x.classList.remove('selected'));
+        el.classList.add('selected');
+        state.dateLabel = dayLabel;
+        state.dateKey = dayKey;
+        buildTimes(date.getTime() === today.getTime());
+        document.getElementById('timeWrap').style.display = 'block';
+        document.getElementById('timeWrap').scrollIntoView({behavior:'smooth', block:'nearest'});
+      };
+    }
+    grid.appendChild(el);
+  }
 }
 
 function buildTimes(isToday) {
@@ -304,16 +402,26 @@ function buildTimes(isToday) {
   grid.innerHTML = '';
   state.time = null;
   document.getElementById('btn3').disabled = true;
-  const now = new Date().getHours();
+
+  const nowH = new Date().getHours();
+  const busyKey = state.dept + ':' + state.dateKey;
+  const busyList = BOOKED_SLOTS[busyKey] || [];
+
   ALL_TIMES.forEach(t => {
     const h = parseInt(t);
-    const isBusy = isToday && h <= now;
+    const isPast = isToday && h <= nowH;
+    const isBusy = busyList.includes(t);
+
     const btn = document.createElement('div');
-    btn.className = 'time-btn' + (isBusy ? ' busy' : '');
+    let cls = 'time-btn';
+    if (isPast) cls += ' past';
+    else if (isBusy) cls += ' busy';
+    btn.className = cls;
     btn.textContent = t;
-    if (!isBusy) {
+
+    if (!isPast && !isBusy) {
       btn.onclick = () => {
-        document.querySelectorAll('.time-btn:not(.busy)').forEach(x => x.classList.remove('selected'));
+        document.querySelectorAll('.time-btn').forEach(x => x.classList.remove('selected'));
         btn.classList.add('selected');
         state.time = t;
         document.getElementById('btn3').disabled = false;
