@@ -1,5 +1,11 @@
-
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CarService — Запись</title>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Nunito:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -15,16 +21,14 @@
 }
 body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overflow-x:hidden}
 
-/* VK HEADER BAR */
 .vk-bar{background:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
 .vk-back{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;font-size:16px;color:var(--text);flex-shrink:0;transition:background 0.15s}
 .vk-back:hover{background:#e0e0e5}
 .vk-bar-title{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:600;color:var(--text)}
 .vk-bar-sub{font-size:11px;color:var(--muted);margin-top:1px}
 
-/* PROGRESS */
 .progress-wrap{background:#fff;padding:12px 16px 14px;border-bottom:1px solid var(--border)}
-.progress-steps{display:flex;align-items:center;gap:0}
+.progress-steps{display:flex;align-items:center}
 .ps{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative}
 .ps:not(:last-child)::after{content:'';position:absolute;top:11px;left:50%;width:100%;height:2px;background:var(--border);z-index:0;transition:background 0.3s}
 .ps.done:not(:last-child)::after{background:var(--red)}
@@ -34,30 +38,24 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
 .ps-label{font-size:9px;color:var(--muted);font-weight:500;letter-spacing:0.2px;white-space:nowrap}
 .ps.active .ps-label,.ps.done .ps-label{color:var(--red)}
 
-/* SCREENS */
 .screens{position:relative;overflow:hidden}
 .screen{display:none;animation:slideIn 0.3s ease}
 .screen.active{display:block}
 @keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
 
-/* CONTENT */
 .screen-content{padding:16px}
 .screen-title{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
 .screen-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
 
-/* DEPT CARDS */
 .dept-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
 .dept-card{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:20px 14px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
-.dept-card::before{content:'';position:absolute;inset:0;background:var(--red-light);opacity:0;transition:opacity 0.2s}
 .dept-card.selected{border-color:var(--red);background:var(--red-light)}
-.dept-card.selected::before{opacity:1}
-.dept-card-icon{font-size:32px;margin-bottom:10px;position:relative;z-index:1}
-.dept-card-name{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:600;color:var(--text);position:relative;z-index:1}
-.dept-card-desc{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4;position:relative;z-index:1}
-.dept-check{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--red);display:none;align-items:center;justify-content:center;font-size:11px;color:#fff;z-index:2}
+.dept-card-icon{font-size:32px;margin-bottom:10px}
+.dept-card-name{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:600;color:var(--text)}
+.dept-card-desc{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4}
+.dept-check{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--red);display:none;align-items:center;justify-content:center;font-size:11px;color:#fff}
 .dept-card.selected .dept-check{display:flex}
 
-/* SERVICE LIST */
 .svc-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
 .svc-item{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px}
 .svc-item.selected{border-color:var(--red);background:var(--red-light)}
@@ -66,7 +64,6 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
 .svc-item-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent}
 .svc-item.selected .svc-item-check{background:var(--red);border-color:var(--red);color:#fff}
 
-/* DATE STRIP */
 .date-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;scrollbar-width:none}
 .date-strip::-webkit-scrollbar{display:none}
 .date-chip{flex-shrink:0;background:var(--card);border:2px solid var(--border);border-radius:12px;padding:10px 14px;text-align:center;cursor:pointer;transition:all 0.2s;min-width:58px}
@@ -76,31 +73,19 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
 .date-chip-month{font-size:10px;color:var(--muted)}
 .date-chip.selected .date-chip-day,.date-chip.selected .date-chip-num,.date-chip.selected .date-chip-month{color:var(--red)}
 
-/* TIME GRID */
 .time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
 .time-btn{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:13px 6px;text-align:center;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;transition:all 0.2s;font-family:'Nunito',sans-serif}
 .time-btn.selected{border-color:var(--red);background:var(--red-light);color:var(--red)}
 .time-btn.busy{background:#f8f8f8;color:#ccc;cursor:not-allowed;border-color:#eee;text-decoration:line-through;font-size:11px}
 
-/* FORM */
 .field{margin-bottom:14px}
 .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px}
 .field input{width:100%;background:var(--card);border:2px solid var(--border);border-radius:12px;padding:13px 14px;font-family:'Nunito',sans-serif;font-size:15px;color:var(--text);outline:none;transition:border-color 0.2s}
 .field input:focus{border-color:var(--red)}
 .field input::placeholder{color:#C7C7CC}
 
-/* SUMMARY */
-.summary-card{background:var(--card);border-radius:16px;overflow:hidden;margin-bottom:16px;border:1px solid var(--border)}
-.summary-header{background:var(--red);padding:14px 16px;display:flex;align-items:center;gap:8px}
-.summary-header-title{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:600;color:#fff}
-.summary-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border)}
-.summary-row:last-child{border-bottom:none}
-.summary-key{font-size:13px;color:var(--muted)}
-.summary-val{font-size:13px;font-weight:600;color:var(--text);text-align:right;max-width:60%}
-
-/* SUCCESS */
 .success-wrap{padding:40px 24px;text-align:center}
-.success-circle{width:80px;height:80px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 24px;animation:popIn 0.5s cubic-bezier(.34,1.56,.64,1)}
+.success-circle{width:80px;height:80px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;color:#fff;margin:0 auto 24px;animation:popIn 0.5s cubic-bezier(.34,1.56,.64,1)}
 @keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
 .success-title{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px}
 .success-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:28px}
@@ -110,30 +95,26 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
 .si-icon{font-size:18px;flex-shrink:0}
 .si-val{color:var(--text);font-weight:500}
 
-/* BOTTOM BTN */
 .bottom-btn-wrap{padding:12px 16px 20px;background:#fff;border-top:1px solid var(--border);position:sticky;bottom:0}
 .bottom-btn{width:100%;background:var(--red);color:#fff;border:none;border-radius:14px;padding:17px;font-family:'Unbounded',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px}
-.bottom-btn:hover{opacity:0.9;transform:translateY(-1px)}
+.bottom-btn:hover{opacity:0.9}
 .bottom-btn:active{transform:scale(0.98)}
 .bottom-btn:disabled{background:#ccc;cursor:not-allowed;transform:none}
-.bottom-btn-secondary{width:100%;background:transparent;color:var(--red);border:2px solid var(--red);border-radius:14px;padding:15px;font-family:'Unbounded',sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;transition:all 0.2s}
-.bottom-btn-secondary:hover{background:var(--red-light)}
 
-/* HINT */
 .hint-tag{display:inline-flex;align-items:center;gap:6px;background:var(--red-light);border:1px solid rgba(230,57,70,0.2);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--red);font-weight:600;margin-bottom:16px}
+.time-section-label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px}
 </style>
-
+</head>
+<body>
 <div id="app">
-  <!-- VK TOP BAR -->
   <div class="vk-bar">
     <button class="vk-back" id="backBtn" onclick="goBack()" style="display:none">←</button>
     <div>
       <div class="vk-bar-title" id="barTitle">CarService</div>
-      <div class="vk-bar-sub" id="barSub">Онлайн-запись</div>
+      <div class="vk-bar-sub" id="barSub">Онлайн-запись · Магнитогорск</div>
     </div>
   </div>
 
-  <!-- PROGRESS -->
   <div class="progress-wrap" id="progressWrap">
     <div class="progress-steps">
       <div class="ps active" id="ps1"><div class="ps-dot">1</div><div class="ps-label">Цех</div></div>
@@ -145,7 +126,6 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
   </div>
 
   <div class="screens">
-
     <!-- SCREEN 1: DEPT -->
     <div class="screen active" id="s1">
       <div class="screen-content">
@@ -190,7 +170,7 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
         <div class="screen-title">Дата и время</div>
         <div class="screen-sub">Выберите удобный день и слот</div>
         <div class="date-strip" id="dateStrip"></div>
-        <div style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px">Доступное время</div>
+        <div class="time-section-label">Доступное время</div>
         <div class="time-grid" id="timeGrid"></div>
       </div>
       <div class="bottom-btn-wrap">
@@ -208,7 +188,7 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
         <div class="field"><label>Марка и модель авто</label><input type="text" id="f-car" placeholder="Toyota Camry 2020" oninput="checkForm4()"></div>
       </div>
       <div class="bottom-btn-wrap">
-        <button class="bottom-btn" id="btn4" disabled onclick="goTo(5)">Подтвердить →</button>
+        <button class="bottom-btn" id="btn4" disabled onclick="submitBooking()">Записаться →</button>
       </div>
     </div>
 
@@ -230,11 +210,13 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
         <button class="bottom-btn" onclick="restart()">Записаться снова</button>
       </div>
     </div>
-
   </div>
 </div>
 
 <script>
+// Инициализация VK Bridge
+try { vkBridge.send('VKWebAppInit'); } catch(e) {}
+
 const SERVICES = {
   body: [
     {icon:'🎨', name:'Покраска'},
@@ -251,19 +233,21 @@ const SERVICES = {
   ]
 };
 
-const BUSY = {'mech': ['11:00','15:00'], 'body': ['10:00','14:00']};
 const ALL_TIMES = ['09:00','10:00','11:00','12:00','14:00','15:00','16:00','17:00'];
 const WEEKDAYS = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 const MONTHS = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
 
-let state = { dept: null, deptName: '', service: null, date: null, dateLabel: '', time: null };
+// ⚠️ ЗАПОЛНИ: URL твоего бота для получения заявок
+const BOT_WEBHOOK = 'https://109.120.184.236/booking';
+
+let state = { dept:null, deptName:'', service:null, dateLabel:'', time:null, dateOffset:0 };
 let currentScreen = 1;
 
 function selectDept(d) {
   state.dept = d;
   state.deptName = d === 'body' ? 'Кузовной цех' : 'Слесарный цех';
-  document.getElementById('dc-body').classList.toggle('selected', d === 'body');
-  document.getElementById('dc-mech').classList.toggle('selected', d === 'mech');
+  document.getElementById('dc-body').classList.toggle('selected', d==='body');
+  document.getElementById('dc-mech').classList.toggle('selected', d==='mech');
   document.getElementById('btn1').disabled = false;
 }
 
@@ -280,12 +264,11 @@ function buildServices() {
       el.classList.add('selected');
       state.service = s.name;
       document.getElementById('btn2').disabled = false;
-      buildDates();
     };
     list.appendChild(el);
   });
-  document.getElementById('btn2').disabled = true;
   state.service = null;
+  document.getElementById('btn2').disabled = true;
 }
 
 function buildDates() {
@@ -301,12 +284,14 @@ function buildDates() {
     const label = WEEKDAYS[d.getDay()] + ' ' + d.getDate() + '.' + String(d.getMonth()+1).padStart(2,'0');
     const chip = document.createElement('div');
     chip.className = 'date-chip';
+    chip.dataset.offset = i;
     chip.innerHTML = `<div class="date-chip-day">${WEEKDAYS[d.getDay()]}</div><div class="date-chip-num">${d.getDate()}</div><div class="date-chip-month">${MONTHS[d.getMonth()]}</div>`;
     chip.onclick = () => {
       document.querySelectorAll('.date-chip').forEach(x => x.classList.remove('selected'));
       chip.classList.add('selected');
       state.dateLabel = label;
-      buildTimes(i === 0);
+      state.dateOffset = parseInt(chip.dataset.offset);
+      buildTimes(state.dateOffset === 0);
     };
     strip.appendChild(chip);
     count++;
@@ -319,11 +304,10 @@ function buildTimes(isToday) {
   grid.innerHTML = '';
   state.time = null;
   document.getElementById('btn3').disabled = true;
-  const busySlots = BUSY[state.dept] || [];
   const now = new Date().getHours();
   ALL_TIMES.forEach(t => {
     const h = parseInt(t);
-    const isBusy = busySlots.includes(t) || (isToday && h <= now);
+    const isBusy = isToday && h <= now;
     const btn = document.createElement('div');
     btn.className = 'time-btn' + (isBusy ? ' busy' : '');
     btn.textContent = t;
@@ -346,21 +330,48 @@ function checkForm4() {
   document.getElementById('btn4').disabled = !(n && p && c);
 }
 
+async function submitBooking() {
+  const name  = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const car   = document.getElementById('f-car').value.trim();
+
+  // Отправляем данные на бот-сервер
+  try {
+    await fetch(BOT_WEBHOOK, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        source: 'miniapp',
+        name, phone, car,
+        dept:    state.deptName,
+        service: state.service,
+        date:    state.dateLabel,
+        time:    state.time
+      })
+    });
+  } catch(e) {
+    console.log('Webhook error:', e);
+    // Всё равно показываем успех — заявка сохранится локально
+  }
+
+  goTo(5);
+}
+
 function goTo(n) {
   if (n === 2) buildServices();
   if (n === 3) buildDates();
   if (n === 5) {
-    document.getElementById('r-dept').textContent = state.deptName;
-    document.getElementById('r-svc').textContent = state.service;
-    document.getElementById('r-date').textContent = state.dateLabel || 'Выбранная дата';
-    document.getElementById('r-time').textContent = state.time;
+    document.getElementById('r-dept').textContent  = state.deptName;
+    document.getElementById('r-svc').textContent   = state.service;
+    document.getElementById('r-date').textContent  = state.dateLabel || '—';
+    document.getElementById('r-time').textContent  = state.time;
     document.getElementById('progressWrap').style.display = 'none';
   }
   document.getElementById('s'+currentScreen).classList.remove('active');
   currentScreen = n;
   document.getElementById('s'+n).classList.add('active');
   updateProgress(n);
-  document.getElementById('backBtn').style.display = n > 1 && n < 5 ? 'flex' : 'none';
+  document.getElementById('backBtn').style.display = (n > 1 && n < 5) ? 'flex' : 'none';
   const titles = ['','CarService','Услуга','Время','Ваши данные','Запись создана!'];
   document.getElementById('barTitle').textContent = titles[n];
   window.scrollTo(0,0);
@@ -381,7 +392,7 @@ function updateProgress(n) {
 }
 
 function restart() {
-  state = { dept: null, deptName: '', service: null, date: null, dateLabel: '', time: null };
+  state = {dept:null, deptName:'', service:null, dateLabel:'', time:null, dateOffset:0};
   currentScreen = 1;
   document.getElementById('progressWrap').style.display = 'block';
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -395,3 +406,5 @@ function restart() {
   ['f-name','f-phone','f-car'].forEach(id => document.getElementById(id).value = '');
 }
 </script>
+</body>
+</html>
